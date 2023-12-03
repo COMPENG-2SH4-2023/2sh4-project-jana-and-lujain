@@ -24,11 +24,15 @@ class GameMechs
         
         int boardSizeX;
         int boardSizeY;
+        
+        bool loseFlag; //boolen flag recoding whether the player has lost the game 
+        int score; // hoding the current score of the player
 
     public:
         GameMechs();
         GameMechs(int boardX, int boardY);
-        
+        ~GameMechs(); //destructor
+
         bool getExitFlagStatus();
         void setExitTrue();
 
@@ -38,6 +42,12 @@ class GameMechs
 
         int getBoardSizeX();
         int getBoardSizeY();
+
+        bool getLoseFlagStatus();
+        void setLoseFlagStatus(bool status);
+
+        int getScore(); // getter method for the game score
+        void incrementScore(); // specialized stter for the score field
       
 
 };

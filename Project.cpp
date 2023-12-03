@@ -26,6 +26,7 @@ objPos borderLeft[HEIGHT-2];
 objPos borderRight[HEIGHT-2];
 objPos randomSymbols[2]; 
 objPos posPlayer;
+objPos foodPos;
 
 Player* playerPtr; 
 GameMechs* gameMechs;
@@ -64,12 +65,28 @@ void Initialize(void)
     MacUILib_clearScreen();
     exitFlag = false;
 
+    for(int i=0;i< WIDTH; i++) {
+        //creates the top and bottom edge of the border
+        borderTop[i].setObjPos(i,0, '#');
+        borderBottom[i].setObjPos(i,HEIGHT-1, '#');
+    }
+    for(int i=0;i< HEIGHT-2; i++) {
+        //Creates the left and right edge of the border
+        borderLeft[i].setObjPos(0,i+1, '#');
+        borderRight[i].setObjPos(WIDTH-1,i+1, '#');
+    }
+    randomSymbols[0].setObjPos(5, 6, 'J');
+    randomSymbols[1].setObjPos(7,4, 'L'); 
+
+
     gameMechs = new GameMechs(); 
     
     playerPtr = new Player(gameMechs); 
     //GameMechs gameMechsOBJ;
     //playerPtr = new Player(&gameMechsOBJ); 
     playerPtr->getPlayerPos(posPlayer);//we update the posPlayer instances with the player initial position and the symbol
+    gameMechs->generateFood(posPlayer);//generating food
+    gameMechs->getFoodPos(foodPos); //updatting the foodPos instances with the generated food position and food symbol.
 
 
 }
@@ -107,27 +124,16 @@ void DrawScreen(void)
     MacUILib_clearScreen();
   
     //assigning each element of the arrays(topBorder, bottomBorder, leftBorder, rightBorder) to the the specificied position and symbol
-    for(int i=0;i< WIDTH; i++) {
-        //creates the top and bottom edge of the border
-        borderTop[i].setObjPos(i,0, '#');
-        borderBottom[i].setObjPos(i,HEIGHT-1, '#');
-    }
-    for(int i=0;i< HEIGHT-2; i++) {
-        //Creates the left and right edge of the border
-        borderLeft[i].setObjPos(0,i+1, '#');
-        borderRight[i].setObjPos(WIDTH-1,i+1, '#');
-    }
 
-    randomSymbols[0].setObjPos(5, 6, 'J');
-    randomSymbols[1].setObjPos(7,4, 'L'); 
+
 
     int i;
     for( i=0;i<HEIGHT;i++){
         for(int j=0;j<WIDTH;j++) {
             layout[i][j]=' ';
         }
-        layout[i][30]='\n';
-        layout[i][31]='\0';
+        layout[i][WIDTH]='\n';
+        layout[i][WIDTH+1]='\0';
     }
     
     //setting the layout to the updated border symbols with respect to their postion on the x and y coordinates using the arrays we initialized
@@ -141,16 +147,18 @@ void DrawScreen(void)
     }
 
 
-    layout[randomSymbols[0].y][randomSymbols[0].x] = randomSymbols[0].symbol;    
-    layout[randomSymbols[1].y][randomSymbols[1].x] = randomSymbols[1].symbol;    
+  //  layout[randomSymbols[0].y][randomSymbols[0].x] = randomSymbols[0].symbol;    
+  //  layout[randomSymbols[1].y][randomSymbols[1].x] = randomSymbols[1].symbol;    
 
 
     playerPtr->getPlayerPos(posPlayer);//updating the instance posPlayer with the player's position
     layout[posPlayer.y][posPlayer.x] = posPlayer.symbol;    
 
+     layout[foodPos.y][foodPos.x] = foodPos.symbol;
+
 
     //Finally printing out the updated layout for it to be applied on the terminal screen 
-    for( i=0;i<HEIGHT;i++) 
+      for( i=0;i<HEIGHT;i++) 
     {
         MacUILib_printf(layout[i]);
     }

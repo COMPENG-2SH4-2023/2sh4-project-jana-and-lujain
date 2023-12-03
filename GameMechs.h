@@ -24,9 +24,11 @@ class GameMechs
         
         int boardSizeX;
         int boardSizeY;
-        
+
         bool loseFlag; //boolen flag recoding whether the player has lost the game 
         int score; // hoding the current score of the player
+
+        objPos foodPos; //holding the most recently generated food position and its ASCII symbol
 
     public:
         GameMechs();
@@ -48,6 +50,11 @@ class GameMechs
 
         int getScore(); // getter method for the game score
         void incrementScore(); // specialized stter for the score field
+
+        //Random Food Generation
+        void generateFood(objPos blockOff); 
+        void getFoodPos(objPos &returnPos); 
+
       
 
 };

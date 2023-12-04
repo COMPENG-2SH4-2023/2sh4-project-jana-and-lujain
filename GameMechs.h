@@ -52,7 +52,7 @@ class GameMechs
         void incrementScore(); // specialized stter for the score field
 
         //Random Food Generation
-        void generateFood(objPos blockOff); 
+        void generateFood(objPosArrayList* blockOff); 
         void getFoodPos(objPos &returnPos); 
 
       

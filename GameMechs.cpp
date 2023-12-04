@@ -4,8 +4,11 @@
 GameMechs::GameMechs()
 {
     exitFlag = false;
+    loseFlag = false;
     boardSizeX= 30; 
     boardSizeY = 15; 
+    score =0; 
+
     
 
 }
@@ -93,7 +96,7 @@ void GameMechs:: incrementScore()
 }
 
 
-void GameMechs::generateFood(objPos blockOff)
+void GameMechs::generateFood(objPosArrayList * blockOff)
 {
     srand(time(NULL));  // seed the random integer generator
 
@@ -105,15 +108,19 @@ void GameMechs::generateFood(objPos blockOff)
     {
         candidate_x = (rand()%(boardSizeX-2)) +1;
         candidate_y = (rand()%(boardSizeY-2)) +1; 
+        valid=1;
+        for(int i=0; i< blockOff->getSize(); i++){
+            objPos pos;
+            blockOff->getElement(pos, i);
 
-        if(candidate_x == blockOff.x && candidate_y == blockOff.y)
-        {
-            valid = 0; 
+            if(candidate_x == pos.x && candidate_y == pos.y)
+            {
+                valid = 0; 
+                break;
+            }
         }
-        else
-        {
-            valid = 1; 
-        }
+
+
 
 
         if(valid == 1)

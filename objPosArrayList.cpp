@@ -13,6 +13,8 @@ objPosArrayList::objPosArrayList()
     sizeList = 0; 
     aList = new objPos[sizeArray]; 
 
+    //aList[sizeList].setObjPos(5,5,'*');
+
 
 }
 

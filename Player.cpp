@@ -5,9 +5,16 @@ Player::Player(GameMechs* thisGMRef)
 {
     mainGameMechsRef = thisGMRef;
     myDir = STOP;
-    playerPos.setObjPos(5,5,'*'); //Jana Nofal
+    incLength= false;
+    playerPosList = new objPosArrayList(); 
+    objPos playerPos; 
+    playerPos.setObjPos(5,5,'*');
+    playerPosList->insertHead(playerPos);
+    
 
     // more actions to be included
+    objPos foodPos;
+    mainGameMechsRef->getFoodPos(foodPos); 
 
 
 }
@@ -19,10 +26,10 @@ Player::~Player()
     delete mainGameMechsRef;
 }
 
-void Player::getPlayerPos(objPos &returnPos)
+ objPosArrayList* Player::getPlayerPos()
 {
     // return the reference to the playerPos arrray list
-    returnPos.setObjPos(playerPos);
+    return playerPosList;
 }
 
 void Player::updatePlayerDir()
@@ -92,7 +99,12 @@ void Player::updatePlayerDir()
 
 void Player::movePlayer()
 {
+    objPos playerPos;
+    playerPosList->getHeadElement(playerPos);
+    bool hit= false;
+
     // PPA3 Finite State Machine logic
+
     switch(myDir)// based on the direction changed based on the input given before, we then continue on to the switch cases regarding the  mFSMode
     {
         case UP://if command is up, then the y-coordinate of the player will decrese resulting in the symbol going up
@@ -101,6 +113,14 @@ void Player::movePlayer()
             {
                 playerPos.y = mainGameMechsRef->getBoardSizeY()-2;//this is the wrap around command that enables the player to go the buttom of the screen once it reaches the top of the screen as it the y-cordinate decreases in value
             }
+            
+            playerPosList->insertHead(playerPos); 
+            if(incLength){
+                incLength=false;
+            } else {
+                playerPosList->removeTail();
+            }
+
             break;
         case DOWN:
 
@@ -109,6 +129,13 @@ void Player::movePlayer()
             {
                 playerPos.y = 1;// resets it to y-coordinate = to 1
             }
+            playerPosList->insertHead(playerPos); 
+            if(incLength){
+                incLength=false;
+            } else {
+                playerPosList->removeTail();
+            }            //instead of deleting the tall when we add insert a head when food consumption occurs
+
             break;
         case LEFT:
             playerPos.x--;//left results in a drecese in value
@@ -116,12 +143,23 @@ void Player::movePlayer()
             {
                 playerPos.x = mainGameMechsRef->getBoardSizeX()-2;// the edge of the screen to the rght
             }
-            break;
+            playerPosList->insertHead(playerPos); 
+            if(incLength){
+                incLength=false;
+            } else {
+                playerPosList->removeTail();
+            }           break;
         case RIGHT:
             playerPos.x++;
             if(playerPos.x==mainGameMechsRef->getBoardSizeX()-1)//edge one unit beyond 
             {
                 playerPos.x = 1;//resets to 1
+            }
+            playerPosList->insertHead(playerPos); 
+            if(incLength){
+                incLength=false;
+            } else {
+                playerPosList->removeTail();
             }
             break;
         default:
@@ -130,8 +168,46 @@ void Player::movePlayer()
             //The player wraps around when it reaches the edge nto the border, but 1 unit beyound it to prevent it from wrapping around before 
 
 
-     }
+    }
 
+    if(checkFoodConsumption()){
+        increasePlayerLength();
+        mainGameMechsRef->generateFood(playerPosList);//generating food
+    }
+
+    for(int i =1; i<playerPosList->getSize(); i++)
+    {
+        objPos arrayPos;
+        playerPosList->getElement(arrayPos, i);
+        if(playerPos.x == arrayPos.x && playerPos.y == arrayPos.y)
+        {
+            mainGameMechsRef->setExitTrue(); 
+            mainGameMechsRef->setLoseFlagStatus(false);
+        }
+
+    }
 }
 
 
+
+bool Player::checkFoodConsumption()
+{
+    objPos foodPos;
+    mainGameMechsRef->getFoodPos(foodPos); 
+    objPos playerPos;
+    playerPosList->getHeadElement(playerPos);
+    if(playerPos.x == foodPos.x && playerPos.y == foodPos.y)
+    {
+        mainGameMechsRef->incrementScore();
+        //mainGameMechsRef->generateFood(playerPosList);
+        return true; 
+    }
+    return false;
+
+}
+void Player::increasePlayerLength()
+{
+    incLength = true;
+
+
+}

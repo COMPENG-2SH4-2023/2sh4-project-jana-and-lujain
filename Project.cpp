@@ -8,9 +8,12 @@ using namespace std;
 
 #define DELAY_CONST 100000
 
-bool exitFlag;
 int i, j; 
+char cmd; //for debugging message 
+char this_input;//process user input 
 
+
+//for board border 
 #define WIDTH 30
 #define HEIGHT 15
 
@@ -24,12 +27,18 @@ objPos borderTop[WIDTH];
 objPos borderBottom[WIDTH];
 objPos borderLeft[HEIGHT-2];
 objPos borderRight[HEIGHT-2];
-objPos randomSymbols[2]; 
-objPos posPlayer;
+//objPos randomSymbols[2]; 
+
+//replacing the data memeber objPos playerPos with the objPosArrayList* playerPosList
+//objPos posPlayer;
+objPosArrayList* playerPosList; 
+
 objPos foodPos;
 
-Player* playerPtr; 
+Player* playerPtr; //pointer to Okayer OBject in the global scope 
+
 GameMechs* gameMechs;
+
 
 
 void Initialize(void);
@@ -46,7 +55,7 @@ int main(void)
 
     Initialize();
 
-    while(exitFlag == false)  
+    while(gameMechs->getExitFlagStatus() == false)  
     {
         GetInput();
         RunLogic();
@@ -63,8 +72,10 @@ void Initialize(void)
 {
     MacUILib_init();
     MacUILib_clearScreen();
-    exitFlag = false;
+    this_input =0;
+    cmd = 0; 
 
+    //initialize the board border  for it to be printed out in draw screan rotine
     for(int i=0;i< WIDTH; i++) {
         //creates the top and bottom edge of the border
         borderTop[i].setObjPos(i,0, '#');
@@ -75,32 +86,31 @@ void Initialize(void)
         borderLeft[i].setObjPos(0,i+1, '#');
         borderRight[i].setObjPos(WIDTH-1,i+1, '#');
     }
-    randomSymbols[0].setObjPos(5, 6, 'J');
-    randomSymbols[1].setObjPos(7,4, 'L'); 
 
 
-    gameMechs = new GameMechs(); 
+    gameMechs = new GameMechs(); //in
     
-    playerPtr = new Player(gameMechs); 
-    //GameMechs gameMechsOBJ;
-    //playerPtr = new Player(&gameMechsOBJ); 
-    playerPtr->getPlayerPos(posPlayer);//we update the posPlayer instances with the player initial position and the symbol
-    gameMechs->generateFood(posPlayer);//generating food
+    playerPtr = new Player(gameMechs); //
+
+    objPosArrayList* pos = playerPtr->getPlayerPos();
+    gameMechs->generateFood(pos);//generating food
+
     gameMechs->getFoodPos(foodPos); //updatting the foodPos instances with the generated food position and food symbol.
 
+    
 
 }
 
 void GetInput(void)
 {
-    char this_input =0;
     if (MacUILib_hasChar()){
     this_input= MacUILib_getChar(); 
     
     if (this_input== 'w' || this_input == 'd' || this_input == 's'|| this_input == 'a' || this_input == 'W' || this_input == 'D'|| this_input == 'S' || this_input == 'A' || this_input == '+' || this_input == '-'){
         gameMechs->setInput(this_input); //apply the input recieved to the gameMechs
         } 
-    else if ( this_input ==  ' '){ 
+    else if ( this_input ==  '\t'){ 
+        gameMechs->setInput(this_input);
         gameMechs->setExitTrue();
     }
     else{
@@ -150,22 +160,66 @@ void DrawScreen(void)
   //  layout[randomSymbols[0].y][randomSymbols[0].x] = randomSymbols[0].symbol;    
   //  layout[randomSymbols[1].y][randomSymbols[1].x] = randomSymbols[1].symbol;    
 
+    objPosArrayList * posArray;
+    posArray=playerPtr->getPlayerPos();//updating the instance posPlayer with the player's position
 
-    playerPtr->getPlayerPos(posPlayer);//updating the instance posPlayer with the player's position
-    layout[posPlayer.y][posPlayer.x] = posPlayer.symbol;    
+    
+    for(i=0;i<posArray->getSize();i++) {
+        objPos posPlayer;
+        posArray->getElement(posPlayer, i);
+        layout[posPlayer.y][posPlayer.x] = posPlayer.symbol;    
+    }
+    gameMechs->getFoodPos(foodPos); //updatting the foodPos instances with the generated food position and food symbol.
 
-     layout[foodPos.y][foodPos.x] = foodPos.symbol;
+    layout[foodPos.y][foodPos.x] = foodPos.symbol;
 
 
     //Finally printing out the updated layout for it to be applied on the terminal screen 
-      for( i=0;i<HEIGHT;i++) 
+    for( i=0;i<HEIGHT;i++) 
     {
         MacUILib_printf(layout[i]);
     }
 
     //MacUILib_printf("Score: %d", gameMechsOBJ.getScore()); 
     
+    MacUILib_printf("Score: %d\n", gameMechs->getScore());
+    MacUILib_printf("======== DEBUG MESSAGE ========\n");
+    MacUILib_printf("Board Size: %d x %d \n", gameMechs->getBoardSizeX(), gameMechs->getBoardSizeY());
 
+    if(this_input == 'w')
+    {
+        cmd = 'U'; 
+    }
+    else if(this_input == 's')
+    {
+        cmd = 'D';
+    }
+    else if( this_input == 'a')
+    {
+        cmd = 'L';
+    }
+    else if(this_input == 'd')
+    {
+        cmd = 'R';
+    }
+    else
+    {
+        cmd = '0'; 
+    }
+
+    MacUILib_printf("Player Direction: %c\n", cmd);
+
+    objPosArrayList * playerCoor;
+    playerCoor = playerPtr->getPlayerPos(); 
+    objPos coordinates; 
+    playerCoor->getHeadElement(coordinates); 
+    MacUILib_printf("Player Position: %d, %d\n", coordinates.x, coordinates.y ); 
+
+    if(gameMechs->getExitFlagStatus())
+    {
+        MacUILib_clearScreen();
+        MacUILib_printf("YOU LOST"); 
+    }
 
 }
 

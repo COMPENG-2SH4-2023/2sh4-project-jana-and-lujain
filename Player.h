@@ -29,7 +29,11 @@ class Player
     private:
         objPosArrayList* playerPosList;   // Upgrade this in iteration 3.       
         enum Dir myDir;
+
         bool incLength;
+        //incLength will be used for food consumption
+        //incLength is used when food consumption occurs we have to insert the head but we dont remove the tail
+
         // Need a reference to the Main Game Mechanisms
         GameMechs* mainGameMechsRef;
 };

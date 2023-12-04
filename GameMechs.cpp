@@ -15,15 +15,13 @@ GameMechs::GameMechs()
 
 GameMechs::GameMechs(int boardX, int boardY)
 {
-
+    //we have no use of copy constructor in the program
 }
 
 // do you need a destructor?
-//we can add this desctuctor if i later add dynamic memory allocation
 GameMechs :: ~GameMechs(){
-    
-
-
+    //we have no use of this destructor in the program
+    //we end up deleting allocated memeory for GameMechs in the Project.cpp in the clean up routine    
 }
 
 
@@ -70,11 +68,9 @@ void GameMechs::clearInput()
 
 }
 
-//Lujy Implementation:
 bool GameMechs :: getLoseFlagStatus()
 {
     return loseFlag;
-   // cout << "Debug: Game Lost" << endl;
 }
 
 void GameMechs :: setLoseFlagStatus( bool status)
@@ -92,7 +88,6 @@ int GameMechs:: getScore()
 void GameMechs:: incrementScore()
 {
     score++;
-  //  cout << "Score Incermented-Currect Score=" << score << endl;
 }
 
 
@@ -109,10 +104,13 @@ void GameMechs::generateFood(objPosArrayList * blockOff)
         candidate_x = (rand()%(boardSizeX-2)) +1;
         candidate_y = (rand()%(boardSizeY-2)) +1; 
         valid=1;
+
+        //in this for loop we are checking to make sure that the randomly generted coordinates do not over lap any of the player elements
         for(int i=0; i< blockOff->getSize(); i++){
             objPos pos;
             blockOff->getElement(pos, i);
-
+            
+            //for this condition: if true, while loop will continue to generate new random coordinates 
             if(candidate_x == pos.x && candidate_y == pos.y)
             {
                 valid = 0; 
@@ -122,7 +120,7 @@ void GameMechs::generateFood(objPosArrayList * blockOff)
 
 
 
-
+        //if the randomly generated coordinates do not over lap any of the players elements(valid =1), the food position will be updated 
         if(valid == 1)
         {
             foodPos.x = candidate_x;

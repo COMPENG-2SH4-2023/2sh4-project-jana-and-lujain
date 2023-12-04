@@ -72,10 +72,12 @@ void Initialize(void)
 {
     MacUILib_init();
     MacUILib_clearScreen();
+
     this_input =0;
     cmd = 0; 
 
-    //initialize the board border  for it to be printed out in draw screan rotine
+    //assigning each element of the arrays(topBorder, bottomBorder, leftBorder, rightBorder) to the the specificied position and symbol
+    //this will be used fir the layout and to print the board border
     for(int i=0;i< WIDTH; i++) {
         //creates the top and bottom edge of the border
         borderTop[i].setObjPos(i,0, '#');
@@ -90,11 +92,12 @@ void Initialize(void)
 
     gameMechs = new GameMechs(); //in
     
-    playerPtr = new Player(gameMechs); //
+    playerPtr = new Player(gameMechs); //initializing player object on the heap
 
-    objPosArrayList* pos = playerPtr->getPlayerPos();
+
+    //first generate food call
+    objPosArrayList* pos = playerPtr->getPlayerPos();//record the plater position and passing it into the genrateFood method
     gameMechs->generateFood(pos);//generating food
-
     gameMechs->getFoodPos(foodPos); //updatting the foodPos instances with the generated food position and food symbol.
 
     
@@ -104,17 +107,17 @@ void Initialize(void)
 void GetInput(void)
 {
     if (MacUILib_hasChar()){
-    this_input= MacUILib_getChar(); 
+    this_input= MacUILib_getChar(); //recordint the user input into this_input
     
     if (this_input== 'w' || this_input == 'd' || this_input == 's'|| this_input == 'a' || this_input == 'W' || this_input == 'D'|| this_input == 'S' || this_input == 'A' || this_input == '+' || this_input == '-'){
         gameMechs->setInput(this_input); //apply the input recieved to the gameMechs
         } 
-    else if ( this_input ==  '\t'){ 
+    else if ( this_input ==  '\t'){ //exit command is tab on keyboard
         gameMechs->setInput(this_input);
-        gameMechs->setExitTrue();
+        gameMechs->setExitTrue();//exit the game
     }
     else{
-        this_input = 0; 
+        this_input = 0; //resets input so no input is double-processed
     }
     }
 
@@ -133,7 +136,6 @@ void DrawScreen(void)
 {
     MacUILib_clearScreen();
   
-    //assigning each element of the arrays(topBorder, bottomBorder, leftBorder, rightBorder) to the the specificied position and symbol
 
 
 
@@ -156,22 +158,20 @@ void DrawScreen(void)
         layout[borderRight[i].y][borderRight[i].x]=borderRight[i].symbol;
     }
 
-
-  //  layout[randomSymbols[0].y][randomSymbols[0].x] = randomSymbols[0].symbol;    
-  //  layout[randomSymbols[1].y][randomSymbols[1].x] = randomSymbols[1].symbol;    
-
-    objPosArrayList * posArray;
-    posArray=playerPtr->getPlayerPos();//updating the instance posPlayer with the player's position
-
+    //This section is for updating the player on the screen
+    objPosArrayList* posArray;
+    posArray = playerPtr->getPlayerPos();//updating the instance posPlayer with the player's position
     
     for(i=0;i<posArray->getSize();i++) {
+        //printing out every element from the player 
         objPos posPlayer;
         posArray->getElement(posPlayer, i);
         layout[posPlayer.y][posPlayer.x] = posPlayer.symbol;    
     }
+
     gameMechs->getFoodPos(foodPos); //updatting the foodPos instances with the generated food position and food symbol.
 
-    layout[foodPos.y][foodPos.x] = foodPos.symbol;
+    layout[foodPos.y][foodPos.x] = foodPos.symbol;//printing the food generated onto the screen
 
 
     //Finally printing out the updated layout for it to be applied on the terminal screen 
@@ -180,12 +180,13 @@ void DrawScreen(void)
         MacUILib_printf(layout[i]);
     }
 
-    //MacUILib_printf("Score: %d", gameMechsOBJ.getScore()); 
-    
+
+    //debugging messeages     
     MacUILib_printf("Score: %d\n", gameMechs->getScore());
     MacUILib_printf("======== DEBUG MESSAGE ========\n");
     MacUILib_printf("Board Size: %d x %d \n", gameMechs->getBoardSizeX(), gameMechs->getBoardSizeY());
 
+    //updating cmd based on the user input to be printed on the screen 
     if(this_input == 'w')
     {
         cmd = 'U'; 
@@ -209,13 +210,17 @@ void DrawScreen(void)
 
     MacUILib_printf("Player Direction: %c\n", cmd);
 
+    //printing the Player's head coordinates on the screen 
     objPosArrayList * playerCoor;
-    playerCoor = playerPtr->getPlayerPos(); 
+    playerCoor = playerPtr->getPlayerPos(); //updating playerCoor with the coordinates of the player 
+
     objPos coordinates; 
-    playerCoor->getHeadElement(coordinates); 
+    playerCoor->getHeadElement(coordinates); //updates the objPos coordinates with the cooridnates of the head element for it to be printed
+
     MacUILib_printf("Player Position: %d, %d\n", coordinates.x, coordinates.y ); 
 
-    if(gameMechs->getExitFlagStatus())
+    //Losing Screen
+    if(gameMechs->getLoseFlagStatus())
     {
         MacUILib_clearScreen();
         MacUILib_printf("YOU LOST"); 
@@ -226,6 +231,7 @@ void DrawScreen(void)
 void LoopDelay(void)
 {
     MacUILib_Delay(DELAY_CONST*4); // 0.1s delay
+    //We decreased the game speed
 }
 
 

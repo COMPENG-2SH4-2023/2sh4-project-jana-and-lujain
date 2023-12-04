@@ -1,8 +1,5 @@
 #include "objPosArrayList.h"
 
-// Paste your CUTE Tested implementation here.
-// Paste your CUTE Tested implementation here.
-// Paste your CUTE Tested implementation here.
 
 // Check lecture contents on general purpose array list construction, 
 // and modify it to support objPos array list construction.
@@ -12,10 +9,6 @@ objPosArrayList::objPosArrayList()
     sizeArray = ARRAY_MAX_CAP; 
     sizeList = 0; 
     aList = new objPos[sizeArray]; 
-
-    //aList[sizeList].setObjPos(5,5,'*');
-
-
 }
 
 objPosArrayList::~objPosArrayList()
